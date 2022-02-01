@@ -10,6 +10,10 @@ using namespace std;
 struct student{
 
     //Define struct student with four member (name ,id , gender, gpa);
+	char *name;
+	int id;
+	char gender;
+	float gpa;
     
 };
 
@@ -20,7 +24,7 @@ struct course{
 	vector<student *> student_list;
 };
 
-student * findstudent(vector<student> allstudents,int key){ //There is something wrong in this line.
+student * findstudent(vector<student> &allstudents,int key){ //There is something wrong in this line.
 	for(unsigned int i = 0; i < allstudents.size(); i++){
 		if(allstudents[i].id  == key) return &allstudents[i];
 	}
@@ -54,17 +58,28 @@ void printreport(vector<course> allcourses){
 }
 
 int main(){
+	int i=0,j=0;
 	ifstream student_file("students.txt");
 	ifstream course_file("courses.txt");
 	vector<student> allstudents;
 	vector<course> allcourses;
 	
 	string textline;
+	char names[100][100];
+	int k=0;
 	
 	while(getline(student_file,textline)){
 		student s; 
 		
 		//Use sscanf() to split the values in textline and assign those values to the members of struct s;
+		char check[] = "%[^,],%d,%c,%f";
+
+		int ids;
+		char genders;
+		float gpas;
+		sscanf(textline.c_str(),check,&names[k][0],&ids,&genders,&gpas);
+		s = {&names[k][0],ids,genders,gpas};
+		k++;
 
 		allstudents.push_back(s); 		
 	}
@@ -85,15 +100,26 @@ int main(){
 			}else{
 			
 			    //Append (push_back) textline to lecture_list[] of the recently added course in allcourses[];
-			    
+				do{
+				if(textline == "> Students")
+				{
+					i++;
+					state = 3;
+					break;
+				}
+				allcourses[i].lecture_list.push_back(textline);
+				}while(getline(course_file,textline));
 			}			
 		}else{
 			if(textline == "---------------------------------------"){
 				state = 1;
+				j++;
 			}else{
 				student *p = findstudent(allstudents,atof(textline.c_str()));
 				
 				//Append (push_back) p to student_list of the recently added course in allcourses[];
+
+				allcourses[j].student_list.push_back(p);
 				
 			}
 		}
